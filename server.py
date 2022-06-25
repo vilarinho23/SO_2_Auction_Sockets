@@ -20,6 +20,7 @@ server.listen()
 #Variaveis e listas
 clientes = []
 nomes = []
+leiloes_hist = []
 nome_obj = ''
 preço_obj = ''
 nome_comp = ''
@@ -60,6 +61,8 @@ def receber():
         nomes.append(nome_utilizador)
         clientes.append(cliente)
         clientes_conectados += 1
+        if estado_leilao == True:
+            cliente.send(f"Leilão de {nome_obj} ativo. Preço Inicial: {preço_obj}€".encode(FORMAT))
         thread = threading.Thread(target=lidar, args=(cliente,))
         thread.start()
     
@@ -139,9 +142,9 @@ def op1():
         else:
             continue
     
-    f = open("leiloes.txt","a")
-    f.write(f"Objeto Leiloado: {nome_obj}  Preço: {preço_obj}€  Comprador: {nome_comp}\n")
-    f.close()
+
+    leiloes_hist.append(f"Objeto Leiloado: {nome_obj}  Preço: {preço_obj}€  Comprador: {nome_comp}")
+
 
 #Temporizador para se nao houver licitações, acabar o leilão
 def temp():
@@ -191,16 +194,14 @@ def op3():
         print("")
     else:
         count = 0
-        f = open("leiloes.txt","r")
-        linhas = f.readlines()
-        for i in linhas:
+        for i in leiloes_hist:
             count += 1
             if count == 1:
                 print("")
                 print(i)
             if count > 1:
                 print(i)
-        f.close()
+        print("")
 
 #Iniciar thread para receber clientes e iniciar o menu no servidor
 receber_thread = threading.Thread(target=receber)
