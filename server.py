@@ -1,4 +1,5 @@
 #Importar librarias adicionais
+from ctypes.wintypes import DWORD
 import os
 import socket
 import threading
@@ -62,7 +63,7 @@ def receber():
         clientes.append(cliente)
         clientes_conectados += 1
         if estado_leilao == True:
-            cliente.send(f"Leilão de {nome_obj} ativo. Preço Inicial: {preço_obj}€".encode(FORMAT))
+            cliente.send(f"Leilão de {nome_obj} ativo. Preço Atual: {preço_obj}€".encode(FORMAT))
         thread = threading.Thread(target=lidar, args=(cliente,))
         thread.start()
     
@@ -76,15 +77,27 @@ def licitações(cliente, mensagem):
     global numero_lici
     try:
         int(mensagem)
-        if int(mensagem) <= preço_obj:
-            cliente.send(f"Licitação baixa demais".encode(FORMAT))
+        if nome_comp == nome_utilizador:
+            cliente.send(f"Não pode licitar duas vezes seguidas".encode(FORMAT))
         else:
-            preço_obj = int(mensagem)
-            nome_comp = nome_utilizador
-            licitaçoes = True
-            numero_lici = 1
-            transmitir(f"{nome_utilizador} licitou {mensagem}€".encode(FORMAT))
-            #print(f'{nome_utilizador} licitou {mensagem}€')
+            if int(mensagem) < preço_obj:
+                cliente.send(f"Licitação baixa demais".encode(FORMAT))
+            elif int(mensagem) == preço_obj:
+                if not nome_comp:
+                    preço_obj = int(mensagem)
+                    nome_comp = nome_utilizador
+                    licitaçoes = True
+                    numero_lici = 1
+                    transmitir(f"{nome_utilizador} licitou {mensagem}€".encode(FORMAT))
+                else:
+                    cliente.send(f"Licitação baixa demais".encode(FORMAT))
+            else:
+                preço_obj = int(mensagem)
+                nome_comp = nome_utilizador
+                licitaçoes = True
+                numero_lici = 1
+                transmitir(f"{nome_utilizador} licitou {mensagem}€".encode(FORMAT))
+                #print(f'{nome_utilizador} licitou {mensagem}€')
     except:
         cliente.send("Input Inválido.".encode(FORMAT))
 
@@ -122,6 +135,7 @@ def op1():
     global estado_leilao
     global nome_obj
     global preço_obj
+    global nome_comp
     nome_obj = input("Escolha o nome do objeto que deseja leiloar: ")
     while True:
         try:
@@ -130,8 +144,9 @@ def op1():
             print("ERRO. Insira um número...")
         else:
             break
-    transmitir(f"Leilão de {nome_obj} ativo. Preço Inicial: {preço_obj}€".encode(FORMAT))
+    transmitir(f"Leilão de {nome_obj} ativo. Preço Base: {preço_obj}€".encode(FORMAT))
     estado_leilao = True
+    nome_comp = ''
     while True:
         if licitaçoes == True:
             temp()
@@ -141,10 +156,7 @@ def op1():
                 break
         else:
             continue
-    
-
     leiloes_hist.append(f"Objeto Leiloado: {nome_obj}  Preço: {preço_obj}€  Comprador: {nome_comp}")
-
 
 #Temporizador para se nao houver licitações, acabar o leilão
 def temp():
@@ -187,8 +199,8 @@ def op2():
 
 #Opção de mostrar todos os leilões registados no ficheiro leilao.txt que os contem
 def op3():
-    f_tam = os.path.getsize("leiloes.txt")
-    if f_tam == 0:
+    tam = len(leiloes_hist)
+    if tam == 0:
         print("")
         print("Não existem objetos leiloados")
         print("")

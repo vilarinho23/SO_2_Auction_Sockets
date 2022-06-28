@@ -38,6 +38,4 @@ def escrever():
 #Iniciar um thread para a função receber mensagens e outra para a função de enviar
 receber_thread = threading.Thread(target=receber)
 receber_thread.start()
-
-escrever_thread = threading.Thread(target=escrever)
-escrever_thread.start()
+escrever()
