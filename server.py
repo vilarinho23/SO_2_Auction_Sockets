@@ -27,7 +27,7 @@ nome_comp = ''
 licitaçoes = False
 numero_lici = 0
 estado_leilao = False
-
+clientes_conectados = 0
 #Enviar mensagem para todos os clientes ativos
 def transmitir(mensagem):
     for cliente in clientes:
@@ -35,6 +35,7 @@ def transmitir(mensagem):
 
 #Lidar com as mensagens dos diversos clientes e caso o mesmo de desconecte, remover da lista de clientes
 def lidar(cliente):
+    global clientes_conectados
     while True:
         try:
             mensagem = cliente.recv(BUFF).decode(FORMAT)
@@ -47,13 +48,14 @@ def lidar(cliente):
             nome_utilizador = nomes[index]
             clientes.remove(cliente)
             nomes.remove(nome_utilizador)
+            clientes_conectados -= 1
             cliente.close()
             transmitir(f"{nome_utilizador} saiu da casa de leilões!".encode(FORMAT))
             break
 
 #Receber diversos clientes e criar uma thread da função lidar para cada um
 def receber():
-    clientes_conectados = 0
+    global clientes_conectados
     while clientes_conectados < 20:
         cliente, address = server.accept()
         
