@@ -1,5 +1,4 @@
 #Importar librarias adicionais
-from ctypes.wintypes import DWORD
 import os
 import socket
 import threading
