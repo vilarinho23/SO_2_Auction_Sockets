@@ -20,7 +20,6 @@ server.listen()
 #Variaveis e listas
 clientes = []
 nomes = []
-leiloes_hist = []
 nome_obj = ''
 preço_obj = ''
 nome_comp = ''
@@ -157,7 +156,9 @@ def op1():
                 break
         else:
             continue
-    leiloes_hist.append(f"Objeto Leiloado: {nome_obj}  Preço: {preço_obj}€  Comprador: {nome_comp}")
+    f = open("leiloes.txt","a")
+    f.write(f"Objeto Leiloado: {nome_obj}  Preço: {preço_obj}€  Comprador: {nome_comp}\n")
+    f.close()
 
 #Temporizador para se nao houver licitações, acabar o leilão
 def temp():
@@ -200,21 +201,23 @@ def op2():
 
 #Opção de mostrar todos os leilões registados no ficheiro leilao.txt que os contem
 def op3():
-    tam = len(leiloes_hist)
-    if tam == 0:
+    f_tam = os.path.getsize("leiloes.txt")
+    if f_tam == 0:
         print("")
         print("Não existem objetos leiloados")
         print("")
     else:
         count = 0
-        for i in leiloes_hist:
+        f = open("leiloes.txt","r")
+        linhas = f.readlines()
+        for i in linhas:
             count += 1
             if count == 1:
                 print("")
                 print(i)
             if count > 1:
                 print(i)
-        print("")
+        f.close()
 
 #Iniciar thread para receber clientes e iniciar o menu no servidor
 receber_thread = threading.Thread(target=receber)

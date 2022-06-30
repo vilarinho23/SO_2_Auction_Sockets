@@ -1,0 +1,3 @@
+Objeto Leiloado: tv  Preço: 44€  Comprador: david
+Objeto Leiloado: tvl  Preço: 245€  Comprador: david
+Objeto Leiloado: sdf  Preço: 24€  Comprador: david
